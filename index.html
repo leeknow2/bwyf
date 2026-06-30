@@ -18,7 +18,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: '맑은 고딕', 'Malgun Gothic', sans-serif; background: #e8eef5; color: var(--text); min-height: 100vh; }
-
+ 
   /* 헤더 */
   .header {
     background: var(--primary);
@@ -32,10 +32,10 @@
   .header-icon { font-size: 28px; }
   .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
   .header p { font-size: 13px; opacity: 0.75; margin-top: 2px; }
-
+ 
   /* 레이아웃 */
   .container { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
-
+ 
   /* 카드 */
   .card {
     background: white;
@@ -63,7 +63,7 @@
   }
   .card-header.sub { background: var(--accent); font-size: 14px; }
   .card-body { padding: 20px; }
-
+ 
   /* 폼 요소 */
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .form-row.single { grid-template-columns: 1fr; }
@@ -95,7 +95,7 @@
     background: white;
   }
   textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
-
+ 
   /* 업무 항목 블록 */
   .work-block {
     border: 1.5px solid var(--border);
@@ -115,7 +115,7 @@
     border-bottom: 1.5px solid var(--border);
   }
   .work-block-body { padding: 16px; }
-
+ 
   /* 버튼 */
   .btn {
     display: inline-flex;
@@ -165,7 +165,7 @@
     border-radius: 8px;
   }
   .btn-secondary:hover { background: var(--light); }
-
+ 
   /* 하단 버튼 영역 */
   .bottom-bar {
     position: fixed;
@@ -179,7 +179,7 @@
     box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
     z-index: 100;
   }
-
+ 
   /* 미리보기 */
   #preview-area {
     display: none;
@@ -200,7 +200,7 @@
   #preview-area .work-sub { color: var(--muted); margin-left: 8px; margin-bottom: 4px; }
   #preview-area .work-detail { margin-left: 16px; margin-bottom: 2px; }
   #preview-area .work-detail span { font-weight: 700; }
-
+ 
   /* 알림 */
   .toast {
     position: fixed;
@@ -218,7 +218,7 @@
     z-index: 999;
   }
   .toast.show { transform: translateY(0); opacity: 1; }
-
+ 
   /* 도움말 */
   .hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
   .section-divider { border: none; border-top: 2px dashed var(--border); margin: 24px 0; }
@@ -229,7 +229,7 @@
 </style>
 </head>
 <body>
-
+ 
 <div class="header">
   <div class="header-icon">📋</div>
   <div>
@@ -237,9 +237,9 @@
     <p>내용을 입력하면 양식에 맞춰 HWPX 파일로 자동 생성됩니다</p>
   </div>
 </div>
-
+ 
 <div class="container">
-
+ 
   <!-- 기본 정보 -->
   <div class="card">
     <div class="card-header">📌 기본 정보</div>
@@ -274,7 +274,7 @@
       </div>
     </div>
   </div>
-
+ 
   <!-- 월간 핵심 주요업무 -->
   <div class="card">
     <div class="card-header">
@@ -286,7 +286,7 @@
       <button class="btn btn-add" onclick="addWork('core')">＋ 업무 항목 추가</button>
     </div>
   </div>
-
+ 
   <!-- 기관운영 -->
   <div class="card">
     <div class="card-header">□ 기관운영</div>
@@ -295,7 +295,7 @@
       <button class="btn btn-add" onclick="addWork('org')">＋ 업무 항목 추가</button>
     </div>
   </div>
-
+ 
   <!-- 사업운영 -->
   <div class="card">
     <div class="card-header">□ 사업운영</div>
@@ -304,7 +304,7 @@
       <button class="btn btn-add" onclick="addWork('biz')">＋ 업무 항목 추가</button>
     </div>
   </div>
-
+ 
   <!-- 공간 이용실적 -->
   <div class="card">
     <div class="card-header">□ 공간 이용실적</div>
@@ -339,30 +339,30 @@
       </div>
     </div>
   </div>
-
+ 
   <!-- 미리보기 -->
   <div id="preview-area"></div>
-
+ 
 </div>
-
+ 
 <!-- 하단 버튼 -->
 <div class="bottom-bar">
   <button class="btn btn-secondary" onclick="togglePreview()">👁 미리보기</button>
   <button class="btn btn-primary" onclick="downloadHWPX()">⬇ HWPX 파일 다운로드</button>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script>
 let workCounters = { core: 0, org: 0, biz: 0 };
 let usageRowCount = 0;
-
+ 
 // ─── 업무 항목 추가 ───────────────────────────────────────────
 function addWork(type) {
   const n = ++workCounters[type];
   const container = document.getElementById(`${type}-works-container`);
   const typeLabel = { core: '핵심업무', org: '기관운영', biz: '사업운영' }[type];
-
+ 
   const div = document.createElement('div');
   div.className = 'work-block';
   div.id = `${type}-work-${n}`;
@@ -409,12 +409,12 @@ function addWork(type) {
     </div>`;
   container.appendChild(div);
 }
-
+ 
 function removeWork(type, n) {
   const el = document.getElementById(`${type}-work-${n}`);
   if (el) el.remove();
 }
-
+ 
 // ─── 공간 이용실적 행 추가 ───────────────────────────────────
 function addUsageRow() {
   const n = ++usageRowCount;
@@ -435,19 +435,19 @@ function addUsageRow() {
     </td>`;
   tbody.appendChild(tr);
 }
-
+ 
 function removeUsageRow(n) {
   const el = document.getElementById(`usage-row-${n}`);
   if (el) el.remove();
 }
-
+ 
 // ─── 데이터 수집 ─────────────────────────────────────────────
 function collectData() {
   const dept = document.getElementById('dept').value.trim();
   const month = document.getElementById('month').value;
   const author = document.getElementById('author').value.trim();
   const writeDate = document.getElementById('write-date').value.trim();
-
+ 
   const collectWorks = (type) => {
     const works = [];
     for (let i = 1; i <= workCounters[type]; i++) {
@@ -466,7 +466,7 @@ function collectData() {
     }
     return works;
   };
-
+ 
   const usageRows = [];
   for (let i = 1; i <= usageRowCount; i++) {
     const el = document.getElementById(`usage-row-${i}`);
@@ -476,7 +476,7 @@ function collectData() {
     const months = [1,2,3,4,5,6,7].map(m => document.getElementById(`usage-m${m}-${i}`)?.value.trim() || '');
     usageRows.push({ name, months });
   }
-
+ 
   return {
     dept, month, author, writeDate,
     totalUsers: document.getElementById('total-users').value.trim(),
@@ -486,7 +486,7 @@ function collectData() {
     usageRows,
   };
 }
-
+ 
 // ─── 미리보기 ─────────────────────────────────────────────────
 function togglePreview() {
   const area = document.getElementById('preview-area');
@@ -500,7 +500,7 @@ function togglePreview() {
   area.innerHTML = buildPreviewHTML(d);
   area.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-
+ 
 function buildPreviewHTML(d) {
   const renderWorks = (works) => works.map(w => `
     <div class="work-item">
@@ -511,7 +511,7 @@ function buildPreviewHTML(d) {
       ${w.content ? `<div class="work-detail">〇 <span>주요내용:</span> ${w.content}</div>` : ''}
       ${w.etc ? `<div class="work-detail">〇 ${w.etc}</div>` : ''}
     </div>`).join('');
-
+ 
   return `
     <div class="doc-title">&lt;${d.month}월 월간업무보고&gt;</div>
     <div class="doc-dept">&lt;${d.dept}&gt;</div>
@@ -536,7 +536,7 @@ function buildPreviewHTML(d) {
     </table>` : ''}
     ${d.author || d.writeDate ? `<div style="text-align:right;margin-top:24px;color:var(--muted);font-size:13px;">작성자: ${d.author} &nbsp; ${d.writeDate}</div>` : ''}`;
 }
-
+ 
 // ─── HWPX 생성 ───────────────────────────────────────────────
 // 이 부분은 실제 한컴오피스(한글)에서 저장한 hwpx 샘플 파일의 구조를
 // 그대로 가져와서 만들었습니다 (header.xml은 그 파일에서 추출한 것을
@@ -545,26 +545,31 @@ async function downloadHWPX() {
   const d = collectData();
   if (!d.dept) { showToast('기관(센터)명을 입력해주세요', true); return; }
   if (!d.month) { showToast('보고 월을 선택해주세요', true); return; }
-
+ 
   showToast('HWPX 파일 생성 중...');
-
-  let headerXML;
+ 
+  // 필수 파일 두 개를 병렬로 fetch
+  let headerXML, logoBytes;
   try {
-    const res = await fetch('hwpx-header.xml');
-    if (!res.ok) throw new Error('hwpx-header.xml 응답 오류: ' + res.status);
-    headerXML = await res.text();
+    const [resHeader, resLogo] = await Promise.all([
+      fetch('hwpx-header.xml'),
+      fetch('hwpx-logo.png'),
+    ]);
+    if (!resHeader.ok) throw new Error('hwpx-header.xml 응답 오류: ' + resHeader.status);
+    if (!resLogo.ok)   throw new Error('hwpx-logo.png 응답 오류: ' + resLogo.status);
+    headerXML  = await resHeader.text();
+    logoBytes  = await resLogo.arrayBuffer();
   } catch (e) {
-    showToast('hwpx-header.xml 파일을 찾을 수 없어요. index.html과 같은 폴더에 올려주세요.', true);
+    showToast('hwpx-header.xml / hwpx-logo.png 파일을 찾을 수 없어요. index.html과 같은 폴더에 올려주세요.', true);
     console.error(e);
     return;
   }
-
+ 
   const sectionXML = buildSectionXML(d);
   const hpf = buildHPF(d);
-
+ 
   try {
     const zip = new JSZip();
-    // mimetype은 항상 첫 번째 항목 + 무압축(STORE)
     zip.file('mimetype', 'application/hwp+zip', { compression: 'STORE' });
     zip.file('version.xml', buildVersionXML());
     zip.file('settings.xml', buildSettingsXML());
@@ -573,9 +578,10 @@ async function downloadHWPX() {
     zip.file('META-INF/container.rdf', buildContainerRDF());
     zip.file('Preview/PrvText.txt', buildPreviewText(d));
     zip.file('Contents/content.hpf', hpf);
-    zip.file('Contents/header.xml', headerXML); // 실제 한글이 만든 header.xml 그대로
+    zip.file('Contents/header.xml', headerXML);
     zip.file('Contents/section0.xml', sectionXML);
-
+    zip.file('BinData/image1.png', logoBytes); // 헤더 로고 이미지 (양식 상단 그래픽)
+ 
     const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/hwp+zip' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -583,22 +589,19 @@ async function downloadHWPX() {
     a.download = `${d.month}월_월간업무보고_${d.dept}.hwpx`;
     document.body.appendChild(a);
     a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      a.remove();
-    }, 1000);
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
     showToast('✅ 다운로드 완료!');
   } catch(e) {
     showToast('오류 발생: ' + e.message, true);
     console.error(e);
   }
 }
-
+ 
 // ─── HWPX XML 빌더 ───────────────────────────────────────────
 function esc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
+ 
 // 일시/장소 입력값을 양식 표준 공백 규칙에 맞게 자동 정리
 // 예) "7.3.(수)10:00~12:00/시청 잔디광장※개막식 13:00"
 //  → "7. 3.(수) 10:00~12:00 / 시청 잔디광장 ※ 개막식 13:00"
@@ -612,7 +615,7 @@ function fmtDatetime(s) {
     .replace(/ {2,}/g, ' ')            // 연속 공백 정리
     .trim();
 }
-
+ 
 // paraPrIDRef / charPrIDRef 조합은 실제 양식 파일(월간업무보고_양식.hwpx)을
 // 직접 분석해서 추출한 값입니다. header.xml도 같은 파일에서 꺼낸 것이므로 ID가 일치합니다.
 //
@@ -626,7 +629,7 @@ function fmtDatetime(s) {
 // charPr 27: 휴먼명조 15pt            → 〇 일시/장소·대상·주요내용 본문
 // charPr 33: 휴먼명조 15pt            → 주요내용 본문(내용 텍스트)
 // charPr 29: 휴먼명조 15pt            → 사업운영 가/나 항목명
-
+ 
 const STYLE = {
   SECPR:     { p: 2,  c: 14 }, // secPr 담는 첫 단락 (paraPr=2: RIGHT 정렬)
   EMPTY_SM:  { p: 20, c: 22 }, // 구분용 초소형 빈 줄 (2pt)
@@ -644,10 +647,10 @@ const STYLE = {
   ETC:       { p: 59, c: 27 }, // 〇 기타 항목 — 휴먼명조 15pt
   BODY:      { p: 50, c: 27 }, // 일반 본문 — 휴먼명조 15pt
 };
-
+ 
 // 문서 내 모든 문단은 고유 id가 있어야 하므로 빌드할 때마다 카운터를 새로 둠
 let _paraIdCounter = 1000000000;
-
+ 
 function para(text, style, extraRunContent = '') {
   _paraIdCounter++;
   const head = `<hp:p id="${_paraIdCounter}" paraPrIDRef="${style.p}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0">`;
@@ -657,16 +660,16 @@ function para(text, style, extraRunContent = '') {
   }
   return `${head}<hp:run charPrIDRef="${style.c}">${extraRunContent}<hp:t>${esc(text)}</hp:t></hp:run></hp:p>`;
 }
-
+ 
 // 첫 문단의 첫 run에 들어가는 secPr(용지설정)+colPr(단설정).
 // 이 블록은 실제 한글이 만든 hwpx 파일에서 그대로 추출한 내용입니다
 // (손으로 만든 게 아니라 진짜 한글 프로그램이 쓴 XML 원본).
 const SEC_PR_BLOCK = `<hp:secPr id="" textDirection="HORIZONTAL" spaceColumns="1134" tabStop="8000" tabStopVal="4000" tabStopUnit="HWPUNIT" outlineShapeIDRef="1" memoShapeIDRef="0" textVerticalWidthHead="0" masterPageCnt="0"><hp:grid lineGrid="0" charGrid="0" wonggojiFormat="0"/><hp:startNum pageStartsOn="BOTH" page="0" pic="0" tbl="0" equation="0"/><hp:visibility hideFirstHeader="0" hideFirstFooter="0" hideFirstMasterPage="0" border="SHOW_ALL" fill="SHOW_ALL" hideFirstPageNum="0" hideFirstEmptyLine="0" showLineNumber="0"/><hp:lineNumberShape restartType="0" countBy="0" distance="0" startNumber="0"/><hp:pagePr landscape="WIDELY" width="59528" height="84188" gutterType="LEFT_ONLY"><hp:margin header="2834" footer="2834" gutter="0" left="5669" right="5669" top="4251" bottom="4251"/></hp:pagePr><hp:footNotePr><hp:autoNumFormat type="DIGIT" userChar="" prefixChar="" suffixChar=")" supscript="0"/><hp:noteLine length="-1" type="SOLID" width="0.1 mm" color="#000000"/><hp:noteSpacing betweenNotes="850" belowLine="567" aboveLine="567"/><hp:numbering type="CONTINUOUS" newNum="1"/><hp:placement place="EACH_COLUMN" beneathText="0"/></hp:footNotePr><hp:endNotePr><hp:autoNumFormat type="DIGIT" userChar="" prefixChar="" suffixChar=")" supscript="0"/><hp:noteLine length="-1" type="SOLID" width="0.1 mm" color="#000000"/><hp:noteSpacing betweenNotes="850" belowLine="567" aboveLine="567"/><hp:numbering type="CONTINUOUS" newNum="1"/><hp:placement place="END_OF_DOCUMENT" beneathText="0"/></hp:endNotePr><hp:pageBorderFill type="BOTH" borderFillIDRef="1" textBorder="PAPER" headerInside="0" footerInside="0" fillArea="PAPER"><hp:offset left="1417" right="1417" top="1417" bottom="1417"/></hp:pageBorderFill><hp:pageBorderFill type="EVEN" borderFillIDRef="1" textBorder="PAPER" headerInside="0" footerInside="0" fillArea="PAPER"><hp:offset left="1417" right="1417" top="1417" bottom="1417"/></hp:pageBorderFill><hp:pageBorderFill type="ODD" borderFillIDRef="1" textBorder="PAPER" headerInside="0" footerInside="0" fillArea="PAPER"><hp:offset left="1417" right="1417" top="1417" bottom="1417"/></hp:pageBorderFill></hp:secPr><hp:ctrl><hp:colPr id="" type="NEWSPAPER" layout="LEFT" colCount="1" sameSz="1" sameGap="0"/></hp:ctrl>`;
-
+ 
 function buildSectionXML(d) {
   _paraIdCounter = 1000000000;
   let body = '';
-
+ 
   // ── 실제 양식과 동일한 문서 머리 구조 ──────────────────────────────
   // [000] paraPr=2  secPr 포함 빈 단락  (RIGHT 정렬, secPr+colPr 담는 단락)
   // [001] paraPr=20 초소형(2pt) 빈 줄
@@ -680,7 +683,7 @@ function buildSectionXML(d) {
   body += para(`<${d.month}월 월간업무보고>`, STYLE.TITLE);
   body += para('', STYLE.EMPTY);
   body += para(d.dept, STYLE.DEPT);
-
+ 
   // ── 핵심 주요업무 / 기관운영 공통 렌더러 ─────────────────────────
   // paraPr=20 charPr=16: 업무 헤드라인 (HY헤드라인M 16pt)
   // paraPr=73 charPr=52: ➲ 부연설명 (한양중고딕 13pt)
@@ -690,7 +693,7 @@ function buildSectionXML(d) {
   // 첫 번째 이미지 양식 기준: 업무 항목 앞에 ①②③... 원문자 번호
   // ① = \u2460, ② = \u2461, ... ⑩ = \u2469
   const CIRCLE_NUM = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
-
+ 
   // ── 핵심주요업무 / 기관운영 렌더러 ──────────────────────────────
   const renderCoreOrg = (works) => {
     let out = '';
@@ -706,7 +709,7 @@ function buildSectionXML(d) {
     });
     return out;
   };
-
+ 
   // ── 사업운영 렌더러 (①②③ + 가/나/다 조합) ──────────────────────
   // 항목이 하나: ① 단독 헤드라인
   // 항목이 여럿: ① 대표 제목 아래 가. 나. 다. 세부 항목
@@ -736,7 +739,7 @@ function buildSectionXML(d) {
     }
     return out;
   };
-
+ 
   if (d.coreWorks.length) {
     body += para('□ 월간 핵심 주요업무', STYLE.SECTION);
     body += renderCoreOrg(d.coreWorks);
@@ -749,7 +752,7 @@ function buildSectionXML(d) {
     body += para('□ 사업운영', STYLE.SECTION);
     body += renderBiz(d.bizWorks);
   }
-
+ 
   if (d.usageRows.length) {
     const totalLabel = d.totalUsers ? `(${d.totalUsers})` : '';
     body += para(`□ 공간 이용실적 ${totalLabel}`.trim(), STYLE.SECTION);
@@ -762,15 +765,15 @@ function buildSectionXML(d) {
     });
     body += para('', STYLE.EMPTY);
   }
-
+ 
   if (d.author || d.writeDate) {
     body += para(`작성자: ${d.author}　　${d.writeDate}`, STYLE.BODY);
   }
-
+ 
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <hs:sec xmlns:ha="http://www.hancom.co.kr/hwpml/2011/app" xmlns:hp="http://www.hancom.co.kr/hwpml/2011/paragraph" xmlns:hp10="http://www.hancom.co.kr/hwpml/2016/paragraph" xmlns:hs="http://www.hancom.co.kr/hwpml/2011/section" xmlns:hc="http://www.hancom.co.kr/hwpml/2011/core" xmlns:hh="http://www.hancom.co.kr/hwpml/2011/head" xmlns:hhs="http://www.hancom.co.kr/hwpml/2011/history" xmlns:hm="http://www.hancom.co.kr/hwpml/2011/master-page" xmlns:hpf="http://www.hancom.co.kr/schema/2011/hpf" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf/" xmlns:ooxmlchart="http://www.hancom.co.kr/hwpml/2016/ooxmlchart" xmlns:hwpunitchar="http://www.hancom.co.kr/hwpml/2016/HwpUnitChar" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0">${body}</hs:sec>`;
 }
-
+ 
 function buildHPF(d) {
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <opf:package xmlns:opf="http://www.idpf.org/2007/opf/" xmlns:dc="http://purl.org/dc/elements/1.1/" version="" unique-identifier="" id="">
@@ -790,20 +793,20 @@ function buildHPF(d) {
   </opf:spine>
 </opf:package>`;
 }
-
+ 
 // ─── HWPX 패키지 보조 파일들 (실제 한글이 만든 파일의 패턴을 그대로 따름) ──
 function buildVersionXML() {
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <hv:HCFVersion xmlns:hv="http://www.hancom.co.kr/hwpml/2011/version" tagetApplication="WORDPROCESSOR" major="5" minor="1" micro="1" buildNumber="0" os="1" xmlVersion="1.5" application="Hancom Office Hangul" appVersion="12, 0, 0, 4547 WIN32LEWindows_10"/>`;
 }
-
+ 
 function buildSettingsXML() {
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ha:HWPApplicationSetting xmlns:ha="http://www.hancom.co.kr/hwpml/2011/app" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0">
   <ha:CaretPosition listIDRef="0" paraIDRef="0" pos="0"/>
 </ha:HWPApplicationSetting>`;
 }
-
+ 
 function buildContainerXML() {
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ocf:container xmlns:ocf="urn:oasis:names:tc:opendocument:xmlns:container" xmlns:hpf="http://www.hancom.co.kr/schema/2011/hpf">
@@ -814,12 +817,12 @@ function buildContainerXML() {
   </ocf:rootfiles>
 </ocf:container>`;
 }
-
+ 
 function buildManifestXML() {
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <odf:manifest xmlns:odf="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"/>`;
 }
-
+ 
 function buildContainerRDF() {
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -840,12 +843,12 @@ function buildContainerRDF() {
   </rdf:Description>
 </rdf:RDF>`;
 }
-
+ 
 function buildPreviewText(d) {
   return `<${d.month}월 월간업무보고> <${d.dept}>`;
 }
-
-
+ 
+ 
 // ─── 알림 토스트 ─────────────────────────────────────────────
 function showToast(msg, isError=false) {
   const t = document.getElementById('toast');
@@ -854,7 +857,7 @@ function showToast(msg, isError=false) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
-
+ 
 // ─── 초기 항목 자동 추가 ─────────────────────────────────────
 window.addEventListener('load', () => {
   addWork('core');
@@ -868,3 +871,4 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+ 
