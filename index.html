@@ -599,16 +599,36 @@ function esc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// 아래 paraPrIDRef / charPrIDRef 조합은 hwpx-header.xml(실제 한글이 만든 파일)에
-// 실제로 정의되어 사용 중인 조합만 그대로 골라 쓴 것입니다 (직접 만들지 않음)
+// paraPrIDRef / charPrIDRef 조합은 실제 양식 파일(월간업무보고_양식.hwpx)을
+// 직접 분석해서 추출한 값입니다. header.xml도 같은 파일에서 꺼낸 것이므로 ID가 일치합니다.
+//
+// 폰트 참조: hangulFont 7=휴먼명조, 10=HY헤드라인M, 12=한양중고딕, 2=맑은고딕, 3=바탕
+// charPr 26: HY헤드라인M 35pt #262626  → 문서 제목
+// charPr 14: 바탕 10pt               → 부서명 / 일반 빈 줄
+// charPr 22: 바탕 2pt                → 구분용 초소형 빈 줄
+// charPr 40: HY헤드라인M 18pt #231E7E → □ 섹션 제목 (진남색)
+// charPr 16: HY헤드라인M 16pt         → 업무 헤드라인
+// charPr 52: 한양중고딕 13pt          → ➲ 부연설명
+// charPr 27: 휴먼명조 15pt            → 〇 일시/장소·대상·주요내용 본문
+// charPr 33: 휴먼명조 15pt            → 주요내용 본문(내용 텍스트)
+// charPr 29: 휴먼명조 15pt            → 사업운영 가/나 항목명
+
 const STYLE = {
-  TITLE:    { p: 56, c: 26 }, // 문서 제목 (큰 제목)
-  DEPT:     { p: 2,  c: 14 }, // 제목 아래 기관/부서명
-  SECTION:  { p: 57, c: 40 }, // □ 섹션 제목
-  HEADLINE: { p: 20, c: 16 }, // 업무 항목 헤드라인
-  SUB:      { p: 73, c: 52 }, // ➲ 부연설명
-  BODY:     { p: 59, c: 27 }, // 〇 일시/장소·대상·주요내용 등 일반 본문
-  EMPTY:    { p: 20, c: 14 }, // 빈 줄
+  SECPR:     { p: 2,  c: 14 }, // secPr 담는 첫 단락 (paraPr=2: RIGHT 정렬)
+  EMPTY_SM:  { p: 20, c: 22 }, // 구분용 초소형 빈 줄 (2pt)
+  EMPTY:     { p: 20, c: 14 }, // 일반 빈 줄 (10pt 바탕)
+  TITLE:     { p: 56, c: 26 }, // 문서 제목 — CENTER, HY헤드라인M 35pt
+  DEPT:      { p: 2,  c: 14 }, // 부서명 — RIGHT (paraPr=2), 바탕 10pt
+  SECTION:   { p: 57, c: 40 }, // □ 섹션 제목 — LEFT, HY헤드라인M 18pt 진남색
+  HEADLINE:  { p: 20, c: 16 }, // 업무 항목 헤드라인 — HY헤드라인M 16pt
+  BIZ_HEAD:  { p: 21, c: 16 }, // 사업운영 메인 헤드라인 (paraPr=21: LEFT)
+  BIZ_SUB:   { p: 66, c: 29 }, // 사업운영 가/나/다 항목명 — 휴먼명조 15pt
+  SUB:       { p: 73, c: 52 }, // ➲ 부연설명 — 한양중고딕 13pt
+  DATETIME:  { p: 58, c: 27 }, // 〇 일시/장소 — 휴먼명조 15pt
+  TARGET:    { p: 59, c: 27 }, // 〇 대    상 — 휴먼명조 15pt
+  CONTENT:   { p: 60, c: 27 }, // 〇 주요내용 — 휴먼명조 15pt
+  ETC:       { p: 59, c: 27 }, // 〇 기타 항목 — 휴먼명조 15pt
+  BODY:      { p: 50, c: 27 }, // 일반 본문 — 휴먼명조 15pt
 };
 
 // 문서 내 모든 문단은 고유 id가 있어야 하므로 빌드할 때마다 카운터를 새로 둠
@@ -632,47 +652,96 @@ const SEC_PR_BLOCK = `<hp:secPr id="" textDirection="HORIZONTAL" spaceColumns="1
 function buildSectionXML(d) {
   _paraIdCounter = 1000000000;
   let body = '';
-  body += para(`<${d.month}월 월간업무보고>`, STYLE.TITLE, SEC_PR_BLOCK);
-  body += para(`<${d.dept}>`, STYLE.DEPT);
-  body += para('', STYLE.EMPTY);
 
-  const renderWorks = (works) => {
+  // ── 실제 양식과 동일한 문서 머리 구조 ──────────────────────────────
+  // [000] paraPr=2  secPr 포함 빈 단락  (RIGHT 정렬, secPr+colPr 담는 단락)
+  // [001] paraPr=20 초소형(2pt) 빈 줄
+  // [002] paraPr=20 일반 빈 줄
+  // [003] paraPr=56 제목 "7월 월간업무보고"  (CENTER, HY헤드라인M 35pt)
+  // [004] paraPr=20 빈 줄
+  // [005] paraPr=2  부서명  (RIGHT 정렬)
+  body += para('', STYLE.SECPR, SEC_PR_BLOCK);   // secPr는 여기 들어감
+  body += para('', STYLE.EMPTY_SM);
+  body += para('', STYLE.EMPTY);
+  body += para(`<${d.month}월 월간업무보고>`, STYLE.TITLE);
+  body += para('', STYLE.EMPTY);
+  body += para(d.dept, STYLE.DEPT);
+
+  // ── 핵심 주요업무 / 기관운영 공통 렌더러 ─────────────────────────
+  // paraPr=20 charPr=16: 업무 헤드라인 (HY헤드라인M 16pt)
+  // paraPr=73 charPr=52: ➲ 부연설명 (한양중고딕 13pt)
+  // paraPr=58 charPr=27: 〇 일시/장소 (휴먼명조 15pt)
+  // paraPr=59 charPr=27: 〇 대    상  (휴먼명조 15pt)
+  // paraPr=60 charPr=27: 〇 주요내용  (휴먼명조 15pt)
+  const renderCoreOrg = (works) => {
     let out = '';
     works.forEach(w => {
       out += para(` ${w.title}`, STYLE.HEADLINE);
-      if (w.sub) out += para(`  ➲ ${w.sub}`, STYLE.SUB);
-      if (w.datetime) out += para(` 〇 일시/장소: ${w.datetime}`, STYLE.BODY);
-      if (w.target) out += para(` 〇 대\u00a0\u00a0\u00a0\u00a0상: ${w.target}`, STYLE.BODY);
-      if (w.content) out += para(` 〇 주요내용: ${w.content}`, STYLE.BODY);
-      if (w.etc) out += para(` 〇 ${w.etc}`, STYLE.BODY);
+      if (w.sub)     out += para(`  ➲ ${w.sub}`, STYLE.SUB);
+      if (w.datetime) out += para(` 〇 일시/장소: ${w.datetime}`, STYLE.DATETIME);
+      if (w.target)   out += para(` 〇 대\u00a0\u00a0\u00a0\u00a0상: ${w.target}`, STYLE.TARGET);
+      if (w.content)  out += para(` 〇 주요내용: ${w.content}`, STYLE.CONTENT);
+      if (w.etc)      out += para(` 〇 ${w.etc}`, STYLE.ETC);
       out += para('', STYLE.EMPTY);
     });
     return out;
   };
 
+  // ── 사업운영 렌더러 (가/나/다 순번 포함) ─────────────────────────
+  // paraPr=21 charPr=16: 사업 대표 제목 (업무 헤드라인과 동일 폰트/크기)
+  // paraPr=66 charPr=29: 가. 나. 다. 세부 항목명 (휴먼명조 15pt)
+  // paraPr=50 charPr=27: 〇 세부 항목 내용 (휴먼명조 15pt)
+  const KA_LIST = ['가','나','다','라','마','바','사','아','자','차'];
+  const renderBiz = (works) => {
+    let out = '';
+    // 사업운영은 가/나/다 번호를 붙여서 출력 (첫 항목이 메인 헤드라인, 나머지는 하위)
+    if (works.length === 1) {
+      // 항목이 하나면 단독 헤드라인으로
+      const w = works[0];
+      out += para(` ${w.title}`, STYLE.BIZ_HEAD);
+      if (w.sub)      out += para(`  ➲ ${w.sub}`, STYLE.SUB);
+      if (w.datetime) out += para(` 〇 일시/장소: ${w.datetime}`, STYLE.BODY);
+      if (w.target)   out += para(` 〇 대\u00a0\u00a0\u00a0\u00a0상: ${w.target}`, STYLE.BODY);
+      if (w.content)  out += para(` 〇 주요내용: ${w.content}`, STYLE.BODY);
+      if (w.etc)      out += para(` 〇 ${w.etc}`, STYLE.BODY);
+      out += para('', STYLE.EMPTY);
+    } else {
+      works.forEach((w, idx) => {
+        const ka = KA_LIST[idx] || String(idx + 1);
+        out += para(`${ka}. ${w.title}`, STYLE.BIZ_SUB);
+        if (w.sub)      out += para(`  ➲ ${w.sub}`, STYLE.SUB);
+        if (w.datetime) out += para(` 〇 일시/장소: ${w.datetime}`, STYLE.BODY);
+        if (w.target)   out += para(` 〇 대\u00a0\u00a0\u00a0\u00a0상: ${w.target}`, STYLE.BODY);
+        if (w.content)  out += para(` 〇 주요내용: ${w.content}`, STYLE.BODY);
+        if (w.etc)      out += para(` 〇 ${w.etc}`, STYLE.BODY);
+        out += para('', STYLE.EMPTY);
+      });
+    }
+    return out;
+  };
+
   if (d.coreWorks.length) {
     body += para('□ 월간 핵심 주요업무', STYLE.SECTION);
-    body += renderWorks(d.coreWorks);
+    body += renderCoreOrg(d.coreWorks);
   }
   if (d.orgWorks.length) {
     body += para('□ 기관운영', STYLE.SECTION);
-    body += renderWorks(d.orgWorks);
+    body += renderCoreOrg(d.orgWorks);
   }
   if (d.bizWorks.length) {
     body += para('□ 사업운영', STYLE.SECTION);
-    body += renderWorks(d.bizWorks);
+    body += renderBiz(d.bizWorks);
   }
 
   if (d.usageRows.length) {
-    const totalLabel = d.totalUsers ? ` (${d.totalUsers})` : '';
-    body += para(`□ 공간 이용실적${totalLabel}`, STYLE.SECTION);
-    // 이용실적 표 (탭으로 구분한 간이 텍스트 형태 — 실제 표 객체(hp:tbl)가 아닌 단순화된 표현)
-    const header = ['구분','1월','2월','3월','4월','5월','6월','7월','소계'].join('\t');
-    body += para(header, STYLE.BODY);
+    const totalLabel = d.totalUsers ? `(${d.totalUsers})` : '';
+    body += para(`□ 공간 이용실적 ${totalLabel}`.trim(), STYLE.SECTION);
+    // 이용실적: 탭 구분 텍스트 표 (실제 표(hp:tbl) 대신 텍스트 형태로 단순화)
+    const months = ['1월','2월','3월','4월','5월','6월','7월'];
+    body += para(['구분', ...months, '소계'].join('\t'), STYLE.BODY);
     d.usageRows.forEach(r => {
-      const total = r.months.reduce((s,v)=>s+(parseInt(v)||0),0);
-      const row = [r.name, ...r.months, total||''].join('\t');
-      body += para(row, STYLE.BODY);
+      const total = r.months.reduce((s, v) => s + (parseInt(v) || 0), 0);
+      body += para([r.name, ...r.months, total || ''].join('\t'), STYLE.BODY);
     });
     body += para('', STYLE.EMPTY);
   }
