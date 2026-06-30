@@ -599,6 +599,20 @@ function esc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// 일시/장소 입력값을 양식 표준 공백 규칙에 맞게 자동 정리
+// 예) "7.3.(수)10:00~12:00/시청 잔디광장※개막식 13:00"
+//  → "7. 3.(수) 10:00~12:00 / 시청 잔디광장 ※ 개막식 13:00"
+function fmtDatetime(s) {
+  if (!s) return s;
+  return s
+    .replace(/(\d)\.(\d)/g, '$1. $2')  // 숫자.숫자 → 숫자. 숫자 (7.3 → 7. 3)
+    .replace(/\)\s*(\d)/g, ') $1')     // (요일)숫자 → (요일) 숫자 ((수)10 → (수) 10)
+    .replace(/\s*\/\s*/g, ' / ')       // /앞뒤 공백 통일
+    .replace(/\s*※\s*/g, ' ※ ')       // ※앞뒤 공백 통일
+    .replace(/ {2,}/g, ' ')            // 연속 공백 정리
+    .trim();
+}
+
 // paraPrIDRef / charPrIDRef 조합은 실제 양식 파일(월간업무보고_양식.hwpx)을
 // 직접 분석해서 추출한 값입니다. header.xml도 같은 파일에서 꺼낸 것이므로 ID가 일치합니다.
 //
@@ -673,12 +687,18 @@ function buildSectionXML(d) {
   // paraPr=58 charPr=27: 〇 일시/장소 (휴먼명조 15pt)
   // paraPr=59 charPr=27: 〇 대    상  (휴먼명조 15pt)
   // paraPr=60 charPr=27: 〇 주요내용  (휴먼명조 15pt)
+  // 첫 번째 이미지 양식 기준: 업무 항목 앞에 ①②③... 원문자 번호
+  // ① = \u2460, ② = \u2461, ... ⑩ = \u2469
+  const CIRCLE_NUM = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
+
+  // ── 핵심주요업무 / 기관운영 렌더러 ──────────────────────────────
   const renderCoreOrg = (works) => {
     let out = '';
-    works.forEach(w => {
-      out += para(` ${w.title}`, STYLE.HEADLINE);
-      if (w.sub)     out += para(`  ➲ ${w.sub}`, STYLE.SUB);
-      if (w.datetime) out += para(` 〇 일시/장소: ${w.datetime}`, STYLE.DATETIME);
+    works.forEach((w, idx) => {
+      const num = CIRCLE_NUM[idx] || `(${idx + 1})`;
+      out += para(`${num} ${w.title}`, STYLE.HEADLINE);
+      if (w.sub)      out += para(`  ➲ ${w.sub}`, STYLE.SUB);
+      if (w.datetime) out += para(` 〇 일시/장소: ${fmtDatetime(w.datetime)}`, STYLE.DATETIME);
       if (w.target)   out += para(` 〇 대\u00a0\u00a0\u00a0\u00a0상: ${w.target}`, STYLE.TARGET);
       if (w.content)  out += para(` 〇 주요내용: ${w.content}`, STYLE.CONTENT);
       if (w.etc)      out += para(` 〇 ${w.etc}`, STYLE.ETC);
@@ -687,20 +707,17 @@ function buildSectionXML(d) {
     return out;
   };
 
-  // ── 사업운영 렌더러 (가/나/다 순번 포함) ─────────────────────────
-  // paraPr=21 charPr=16: 사업 대표 제목 (업무 헤드라인과 동일 폰트/크기)
-  // paraPr=66 charPr=29: 가. 나. 다. 세부 항목명 (휴먼명조 15pt)
-  // paraPr=50 charPr=27: 〇 세부 항목 내용 (휴먼명조 15pt)
+  // ── 사업운영 렌더러 (①②③ + 가/나/다 조합) ──────────────────────
+  // 항목이 하나: ① 단독 헤드라인
+  // 항목이 여럿: ① 대표 제목 아래 가. 나. 다. 세부 항목
   const KA_LIST = ['가','나','다','라','마','바','사','아','자','차'];
   const renderBiz = (works) => {
     let out = '';
-    // 사업운영은 가/나/다 번호를 붙여서 출력 (첫 항목이 메인 헤드라인, 나머지는 하위)
     if (works.length === 1) {
-      // 항목이 하나면 단독 헤드라인으로
       const w = works[0];
-      out += para(` ${w.title}`, STYLE.BIZ_HEAD);
+      out += para(`① ${w.title}`, STYLE.BIZ_HEAD);
       if (w.sub)      out += para(`  ➲ ${w.sub}`, STYLE.SUB);
-      if (w.datetime) out += para(` 〇 일시/장소: ${w.datetime}`, STYLE.BODY);
+      if (w.datetime) out += para(` 〇 일시/장소: ${fmtDatetime(w.datetime)}`, STYLE.BODY);
       if (w.target)   out += para(` 〇 대\u00a0\u00a0\u00a0\u00a0상: ${w.target}`, STYLE.BODY);
       if (w.content)  out += para(` 〇 주요내용: ${w.content}`, STYLE.BODY);
       if (w.etc)      out += para(` 〇 ${w.etc}`, STYLE.BODY);
@@ -710,7 +727,7 @@ function buildSectionXML(d) {
         const ka = KA_LIST[idx] || String(idx + 1);
         out += para(`${ka}. ${w.title}`, STYLE.BIZ_SUB);
         if (w.sub)      out += para(`  ➲ ${w.sub}`, STYLE.SUB);
-        if (w.datetime) out += para(` 〇 일시/장소: ${w.datetime}`, STYLE.BODY);
+        if (w.datetime) out += para(` 〇 일시/장소: ${fmtDatetime(w.datetime)}`, STYLE.BODY);
         if (w.target)   out += para(` 〇 대\u00a0\u00a0\u00a0\u00a0상: ${w.target}`, STYLE.BODY);
         if (w.content)  out += para(` 〇 주요내용: ${w.content}`, STYLE.BODY);
         if (w.etc)      out += para(` 〇 ${w.etc}`, STYLE.BODY);
